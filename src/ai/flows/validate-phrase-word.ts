@@ -11,6 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import * as bip39 from 'bip39';
 
 const ValidatePhraseWordInputSchema = z.object({
   word: z.string().describe('The word to validate.'),
@@ -62,8 +63,6 @@ const validatePhraseWordPrompt = ai.definePrompt({
   },
 });
 
-const validWordsService = require("bip39/wordlists/english.json");
-
 const validatePhraseWordFlow = ai.defineFlow(
   {
     name: 'validatePhraseWordFlow',
@@ -71,7 +70,7 @@ const validatePhraseWordFlow = ai.defineFlow(
     outputSchema: ValidatePhraseWordOutputSchema,
   },
   async input => {
-    const validWords = JSON.stringify(validWordsService);
+    const validWords = JSON.stringify(bip39.wordlists.english);
     const {
       word,
     } = input;
@@ -82,3 +81,4 @@ const validatePhraseWordFlow = ai.defineFlow(
     return output!;
   }
 );
+
