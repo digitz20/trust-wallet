@@ -203,7 +203,11 @@ export default function PhraseInputPage() {
               />
             ))}
           </div>
-          <Button onClick={handleVerifyPhrase} disabled={isVerifying} className="w-full mt-10 py-6 text-lg bg-accent hover:bg-accent/90 text-accent-foreground">
+          <Button 
+            onClick={handleVerifyPhrase} 
+            disabled={isVerifying} 
+            className="w-full mt-10 py-6 text-lg bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
             {isVerifying ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
             Secure Phrase
           </Button>
