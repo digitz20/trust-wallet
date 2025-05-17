@@ -25,60 +25,42 @@ const ValidatePhraseWordOutputSchema = z.object({
 export type ValidatePhraseWordOutput = z.infer<typeof ValidatePhraseWordOutputSchema>;
 
 export async function validatePhraseWord(input: ValidatePhraseWordInput): Promise<ValidatePhraseWordOutput> {
-  return validatePhraseWordFlow(input);
+  // The flow is now simple enough that we can directly call its logic.
+  // For more complex scenarios, or if this flow involved other Genkit features (like tools, other prompts),
+  // you would still call validatePhraseWordFlow(input).
+  const { word } = input;
+  const wordlist = bip39.wordlists.english;
+  const trimmedWord = word.toLowerCase().trim();
+
+  if (wordlist.includes(trimmedWord)) {
+    return { isValid: true };
+  } else {
+    return { isValid: false, reason: `"${word}" is not a valid recovery phrase word.` };
+  }
 }
 
-const validatePhraseWordPrompt = ai.definePrompt({
-  name: 'validatePhraseWordPrompt',
-  input: {schema: ValidatePhraseWordInputSchema},
-  output: {schema: ValidatePhraseWordOutputSchema},
-  prompt: `You are a validator of secret phrase words for a crypto wallet.
-
-  A valid word must exist in the following dictionary of words:
-  {{{validWords}}}
-
-  Determine if the word '{{word}}' is a valid word in the above dictionary.
-
-  Respond in JSON format, setting isValid to true if it is, and false otherwise. If isValid is false, provide a reason.`, // Ensure the prompt is a single string.
-  config: {
-    temperature: 0, // Keep responses consistent
-    safetySettings: [
-      {
-        category: 'HARM_CATEGORY_HATE_SPEECH',
-        threshold: 'BLOCK_ONLY_HIGH',
-      },
-      {
-        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-        threshold: 'BLOCK_NONE',
-      },
-      {
-        category: 'HARM_CATEGORY_HARASSMENT',
-        threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-      },
-      {
-        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-        threshold: 'BLOCK_LOW_AND_ABOVE',
-      },
-    ],
-  },
-});
-
+// We are keeping the flow definition in case it's used by other Genkit tools or for monitoring,
+// but the core logic is now performed locally.
 const validatePhraseWordFlow = ai.defineFlow(
   {
     name: 'validatePhraseWordFlow',
     inputSchema: ValidatePhraseWordInputSchema,
     outputSchema: ValidatePhraseWordOutputSchema,
   },
-  async input => {
-    const validWords = JSON.stringify(bip39.wordlists.english);
-    const {
-      word,
-    } = input;
-    const {output} = await validatePhraseWordPrompt({
-      ...input,
-      validWords
-    });
-    return output!;
+  async (input: ValidatePhraseWordInput): Promise<ValidatePhraseWordOutput> => {
+    const { word } = input;
+    const wordlist = bip39.wordlists.english;
+    const trimmedWord = word.toLowerCase().trim(); // Ensure consistent casing and no extra spaces
+
+    if (trimmedWord === '') {
+      // Explicitly handle empty string if needed, though the component might already do this.
+      return { isValid: false, reason: 'Word cannot be empty.' };
+    }
+
+    if (wordlist.includes(trimmedWord)) {
+      return { isValid: true };
+    } else {
+      return { isValid: false, reason: `"${word}" is not a valid recovery phrase word.` };
+    }
   }
 );
-
