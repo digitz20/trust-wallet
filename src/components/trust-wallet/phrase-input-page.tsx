@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -148,7 +149,15 @@ export default function PhraseInputPage() {
 
   return (
     <div className="container mx-auto p-4 sm:p-6 md:p-8 max-w-3xl w-full">
-      <header className="mb-8 text-center">
+      <header className="mb-8 text-center flex flex-col items-center">
+        <Image 
+          src="https://placehold.co/64x64.png" 
+          alt="Trust Wallet Logo Placeholder" 
+          width={64} 
+          height={64} 
+          className="mb-4 rounded-lg shadow-md"
+          data-ai-hint="shield security" 
+        />
         <h1 className="text-4xl font-bold text-primary">Trust Wallet</h1>
         <p className="text-muted-foreground mt-2 text-lg">Securely enter your secret phrase.</p>
       </header>
@@ -196,7 +205,7 @@ export default function PhraseInputPage() {
           </div>
           <Button onClick={handleVerifyPhrase} disabled={isVerifying} className="w-full mt-10 py-6 text-lg bg-accent hover:bg-accent/90 text-accent-foreground">
             {isVerifying ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-            Verify Phrase
+            Secure Phrase
           </Button>
         </CardContent>
       </Card>
