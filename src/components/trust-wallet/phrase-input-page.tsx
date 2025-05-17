@@ -154,7 +154,7 @@ export default function PhraseInputPage() {
     <div className="container mx-auto p-4 sm:p-6 md:p-8 max-w-3xl w-full">
       <header className="mb-8 text-center flex flex-col items-center">
         <Image 
-          src="https://i.pinimg.com/736x/6c/3c/74/6c3c744dd40d28853c29f90692d1312e.jpg" 
+          src="https://i.pinimg.com/736x/2a/98/d7/2a98d7c3b241b50f73f799b68a1eb501.jpg" 
           alt="Trust Wallet Logo" 
           width={64} 
           height={64} 
