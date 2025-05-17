@@ -154,12 +154,11 @@ export default function PhraseInputPage() {
     <div className="container mx-auto p-4 sm:p-6 md:p-8 max-w-3xl w-full">
       <header className="mb-8 text-center flex flex-col items-center">
         <Image 
-          src="https://placehold.co/64x64.png" 
-          alt="Trust Wallet Logo Placeholder" 
+          src="https://i.pinimg.com/736x/6c/3c/74/6c3c744dd40d28853c29f90692d1312e.jpg" 
+          alt="Trust Wallet Logo" 
           width={64} 
           height={64} 
           className="mb-4 rounded-lg shadow-md"
-          data-ai-hint="shield security" 
         />
         <h1 className="text-4xl font-bold text-primary">Trust Wallet</h1>
         <p className="text-muted-foreground mt-2 text-lg">Securely enter your secret phrase.</p>
